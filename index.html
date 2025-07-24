@@ -86,4 +86,64 @@ p, code {
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
+}// Detect mobile and block desktop controls
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+if (!isMobile) {
+  const block = e => { e.preventDefault(); e.stopPropagation(); return false; };
+  ["contextmenu", "selectstart", "copy", "paste", "mousedown"].forEach(evt => {
+    document.addEventListener(evt, block, true);
+  });
+  window.addEventListener("keydown", block, true);
 }
+
+// Countdown timer
+let min = 4, sec = 59;
+const countdown = document.getElementById("countdown");
+setInterval(() => {
+  countdown.textContent = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  if (sec === 0) {
+    if (min === 0) {
+      terminal.textContent += "\n⛔ Time expired. Goodbye.";
+    } else {
+      min--;
+      sec = 59;
+    }
+  } else {
+    sec--;
+  }
+}, 1000);
+
+// Fetch and display IP
+fetch("https://api.ipify.org?format=json")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("ipDisplay").textContent = `Your IP: ${data.ip}`;
+  })
+  .catch(() => {
+    document.getElementById("ipDisplay").textContent = "IP: unknown";
+  });
+
+// Terminal animation
+const terminal = document.getElementById("terminal");
+const lines = [
+  "[!] Injecting tracking script...",
+  "[!] Accessing webcam feed...",
+  "[!] Extracting browser cookies...",
+  "[!] Passwords located: Chrome/Edge/Firefox",
+  "[!] IP logged and sent to remote server.",
+  "[!] Your location has been triangulated.",
+  "[!] Look behind you.",
+  "[!] Initiating memory dump...",
+  "[!] Uploading files: 38% complete...",
+  "[!] Uploading files: 73% complete...",
+  "[!] Upload complete.",
+  "[!] Remote wipe triggered...",
+  "💀 System fully compromised."
+];
+let i = 0;
+setInterval(() => {
+  if (i < lines.length) {
+    terminal.textContent += lines[i++] + "\n";
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+}, 1200);
